@@ -22,12 +22,8 @@ sequenceDiagram
     server-->>browser: the javascript file
     deactivate server
 
-    Note right of browser: execution of javascript file starts
-
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
     activate server
     server-->>browser: [{"content": "mm","date": "2024-01-12T13:18:50.464Z"}, ...]
     deactivate server
-
-    Note right of browser: browser renders notes
 ```
