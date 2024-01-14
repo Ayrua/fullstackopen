@@ -4,7 +4,7 @@ import personService from './services/persons'
 
 const strCompare = (i, j) => i.toLowerCase() === j.toLowerCase()
 
-const Names = ({ names, onClick1 }) => names.map((x) => <li key={x.id}>{x.name} {x.number} <button onClick={() => onClick1(x.name, x.id)}>{"delete"}</button></li>)
+const Names = ({ names, onClick1 }) => names.map((x) => <li className='name' key={x.id}>{x.name} {x.number} <button onClick={() => onClick1(x.name, x.id)}>{"delete"}</button></li>)
 
 const PersonForm = ({ submit, v1, onChange1, v2, onChange2 }) => {
   return (
@@ -24,11 +24,37 @@ const PersonForm = ({ submit, v1, onChange1, v2, onChange2 }) => {
 
 const FilterForm = ({ onChange1 }) => <form>filter: <input onChange={onChange1} /></form>
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='update'>
+      {message}
+    </div>
+  )
+}
+
+const ErrorNotification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='error'>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [updateMessage, setUpdateMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     console.log('effect')
@@ -59,10 +85,21 @@ const App = () => {
           personService.update(targetObj.id, updatedObj)
             .then(initialData => {
               //console.log(initialData)
-              const updatedPersons = persons.map( person => (targetObj.id === person.id) ? targetObj : person)
+              const updatedPersons = persons.map(person => (targetObj.id === person.id) ? targetObj : person)
               setPersons(updatedPersons)
               setNewName('')
               setNewNumber('')
+              setUpdateMessage(`Update: '${updatedObj.name}' number was changed to ${updatedObj.number}`)
+              setTimeout(() => {
+                setUpdateMessage(null)
+              }, 3333)
+            })
+            .catch(error => {
+              console.log('error caught')
+              setErrorMessage(`ERROR: ${targetObj.name} was not found on the server`)
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 3333)
             })
         } else {
           alert(`${newName} is already in the list`)
@@ -71,12 +108,16 @@ const App = () => {
     }
     else {
       const personObject = { name: newName, number: newNumber }
-      
+
       personService.create(personObject)
         .then(initialData => {
           setPersons(persons.concat(initialData))
           setNewName('')
           setNewNumber('')
+          setUpdateMessage(`Update: '${personObject.name}' was added to the server`)
+          setTimeout(() => {
+            setUpdateMessage(null)
+          }, 3333)
         })
     }
   }
@@ -91,6 +132,10 @@ const App = () => {
           setPersons(persons.filter((person) => person.id != responseData.id))
           console.log('delete done')
         })
+      setUpdateMessage(`Update: '${name}' was deleted from the server`)
+      setTimeout(() => {
+        setUpdateMessage(null)
+      }, 3333)
     }
     else console.log('canceled delete')
   }
@@ -112,6 +157,8 @@ const App = () => {
 
   return (
     <div>
+      <Notification message={updateMessage} />
+      <ErrorNotification message={errorMessage} />
       <h2>Phonebook</h2>
       <FilterForm onChange1={handleInputChangeFilter} />
       <h2>add a new</h2>
