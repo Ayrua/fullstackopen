@@ -1,22 +1,25 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+import personService from './services/persons'
 
 const strCompare = (i, j) => i.toLowerCase() === j.toLowerCase()
 
-const Names = ({ names }) => names.map((x) => <li key={x.name}>{x.name} {x.number}</li>)
+const Names = ({ names, onClick1 }) => names.map((x) => <li key={x.id}>{x.name} {x.number} <button onClick={() => onClick1(x.name, x.id)}>{"delete"}</button></li>)
 
 const PersonForm = ({ submit, v1, onChange1, v2, onChange2 }) => {
-  <form onSubmit={submit}>
-    <div>
-      name: <input value={v1} onChange={onChange1} />
-    </div>
-    <div>
-      number: <input value={v2} onChange={onChange2} />
-    </div>
-    <div>
-      <button type="submit">add</button>
-    </div>
-  </form>
+  return (
+    <form onSubmit={submit}>
+      <div>
+        name: <input value={v1} onChange={onChange1} />
+      </div>
+      <div>
+        number: <input value={v2} onChange={onChange2} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  )
 }
 
 const FilterForm = ({ onChange1 }) => <form>filter: <input onChange={onChange1} /></form>
@@ -29,11 +32,12 @@ const App = () => {
 
   useEffect(() => {
     console.log('effect')
-    axios.get('http://localhost:3001/persons').then(response => {
+    personService.getAll().then(initialData => {
       console.log('promise fulfilled')
-      setPersons(response.data)
+      setPersons(initialData)
     })
   }, [])
+
   console.log('render', persons.length, 'persons')
 
   const addNumber = (event) => {
@@ -41,10 +45,54 @@ const App = () => {
     console.log('button clicked', event.target)
 
     if (persons.filter(x => strCompare(x.name, newName)).length > 0) {
+      // get the object
       console.log('dupe found')
-      alert(`${newName} is already in the list`)
+      const targetObj = persons.filter((person) => person.name == newName)[0]
+      //console.log(targetObj)
+      if (newNumber != targetObj.number) {
+        console.log('different number found')
+        if (confirm(`update ${targetObj.name} number to ${newNumber}?`)) {
+          console.log('updating person')
+          let updatedObj = targetObj
+          updatedObj.number = newNumber
+
+          personService.update(targetObj.id, updatedObj)
+            .then(initialData => {
+              //console.log(initialData)
+              const updatedPersons = persons.map( person => (targetObj.id === person.id) ? targetObj : person)
+              setPersons(updatedPersons)
+              setNewName('')
+              setNewNumber('')
+            })
+        } else {
+          alert(`${newName} is already in the list`)
+        }
+      }
     }
-    else setPersons([...persons, { name: newName, number: newNumber }])
+    else {
+      const personObject = { name: newName, number: newNumber }
+      
+      personService.create(personObject)
+        .then(initialData => {
+          setPersons(persons.concat(initialData))
+          setNewName('')
+          setNewNumber('')
+        })
+    }
+  }
+
+  const deleteName = (name, id) => {
+    if (confirm(`delete ${name}?`)) {
+      console.log(id)
+      personService.delItem(id)
+        .then(responseData => {
+          console.log(`deleted id ${id}`)
+          console.log(responseData)
+          setPersons(persons.filter((person) => person.id != responseData.id))
+          console.log('delete done')
+        })
+    }
+    else console.log('canceled delete')
   }
 
   const handleInputChange = (event) => {
@@ -70,7 +118,10 @@ const App = () => {
       <PersonForm submit={addNumber} v1={newName} v2={newNumber} onChange1={handleInputChange} onChange2={handleInputChangeNumber} />
       <h2>Numbers</h2>
       <div>
-        <Names names={newFilter === '' ? persons : persons.filter(x => x.name.toLowerCase().includes(newFilter.toLowerCase()))} />
+        <Names
+          names={newFilter === '' ? persons : persons.filter(x => x.name.toLowerCase().includes(newFilter.toLowerCase()))}
+          onClick1={deleteName}
+        />
       </div>
     </div>
   )
