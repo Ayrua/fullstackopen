@@ -1,11 +1,15 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
+const PORT = process.env.PORT || 3001
 
 morgan.token('body', function (req, res) { return (req.method === 'POST' ? JSON.stringify(req.body) : " ")})
 
 app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] :response-time ms :body'))
+app.use(cors())
+app.use(express.static('dist'))
 
 let data = [
     {
@@ -34,9 +38,9 @@ let data = [
 
 app.get('/', (request, response) => {
     response.send(
-        '<h1>Phonebook API</h1>' +
-        '<a href="http://localhost:3001/api/persons">phonebook api all</a> <p \>' +
-        '<a href="http://localhost:3001/info">for info click me</a>'
+        `<h1>Phonebook API</h1>` +
+        `<a href="https://render-test-5mlw.onrender.com/api/persons">phonebook api all</a> <p \>` +
+        `<a href="https://render-test-5mlw.onrender.com/info">for info click me</a>`
     )
 })
 
@@ -88,7 +92,7 @@ app.post('/api/persons', (request, response) => {
     }
 
     const person = {
-        id: Math.random(100000),
+        id: Math.floor(Math.random() * 100000),
         name: body.name,
         number: body.number
     }
@@ -98,7 +102,7 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
-const PORT = 3001
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
