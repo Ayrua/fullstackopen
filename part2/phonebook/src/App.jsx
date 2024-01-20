@@ -119,6 +119,13 @@ const App = () => {
             setUpdateMessage(null)
           }, 3333)
         })
+        .catch(error => {
+          console.log(error.response.data.error)
+          setErrorMessage(`Error: Name should have at least a length of 3.`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 3333)
+        })
     }
   }
 
