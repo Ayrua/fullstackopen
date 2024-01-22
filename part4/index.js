@@ -5,7 +5,6 @@ const cors = require('cors')
 const Blog = require('./models/blog')
 const config = require('./utils/config')
 const blogsRouter = require('./controllers/blogs')
-const mongoUrl = config.MONGODB_URI
 const PORT = config.PORT
 
 
