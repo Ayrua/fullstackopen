@@ -8,6 +8,12 @@ const totalLikes = (array) => {
   return sum
 }
 
+const favoriteBlog = (array) => {
+  const favorite = array.reduce((fav, val) => val.likes > fav.likes ? fav = val : fav)
+  // console.log(favorite)
+  return favorite
+}
+
 module.exports = {
-  dummy, totalLikes
+  dummy, totalLikes, favoriteBlog
 }
