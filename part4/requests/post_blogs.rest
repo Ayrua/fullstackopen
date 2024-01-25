@@ -1,9 +1,10 @@
-POST http://localhost:3003/api/blogs/ 
+POST http://localhost:3003/api/blogs
 content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY1YjI4ZTVhMGMyNmQwZmJiMWI2OWEwZCIsImlhdCI6MTcwNjIwMTE2OH0.g2JdzGWehw-SdCC3RZ87gEQJCdTBI2ZO68F_5MlKhUo
 
 {
     "title": "Test",
     "author": "Mr. Test",
     "url": "test.test.com",
-    "userId": "65b28ca84067249e5995d04c"
+    "userId": "65b28e5a0c26d0fbb1b69a0d"
 }
