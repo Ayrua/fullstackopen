@@ -51,6 +51,20 @@ test('check if blogs increase by one if added', async () => {
   expect(checker).toBe(true)
 })
 
+test('check if blogs created without likes, have 0', async () => {
+  const testBlog = new Blog({
+    'title': 'test title 2',
+    'author': 'test name 2',
+    'url': 'test url 2',
+  })
+  const postResponse = await api.post('/api/blogs', testBlog)
+  const postID = postResponse.body['id']
+
+  const getResponse = await api.get('/api/blogs')
+  const blogObject = getResponse.body.find(x => x.id === postID)
+  expect(blogObject.likes).toBe(0)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
