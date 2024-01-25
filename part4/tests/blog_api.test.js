@@ -65,6 +65,24 @@ test('check if blogs created without likes, have 0', async () => {
   expect(blogObject.likes).toBe(0)
 })
 
+test('check if blogs created without title return 400', async () => {
+  const testBlog = new Blog({
+    // 'title': 'test title 3',
+    'author': 'test name 3',
+    'url': 'test url 3',
+  })
+  await api.post('/api/blogs', testBlog).expect(400)
+})
+
+test('check if blogs created without url return 400', async () => {
+  const testBlog = new Blog({
+    'title': 'test title 4',
+    'author': 'test name 4',
+    // 'url': 'test url 4',
+  })
+  await api.post('/api/blogs', testBlog).expect(400)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
