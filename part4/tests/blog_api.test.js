@@ -89,7 +89,7 @@ describe('schema tests', () => {
   })
 })
 
-describe('delete request test', () => {
+describe('modification request test', () => {
   test('check if blogs are deleted by id', async () => {
     const testBlog = {
       'title': 'test title 5',
@@ -102,6 +102,25 @@ describe('delete request test', () => {
     //console.log(postID)
 
     await api.delete(`/api/blogs/${postID}`).expect(204)
+  })
+
+  test('check if blogs likes change by id', async () => {
+    const testBlog = {
+      'title': 'test title 6',
+      'author': 'test name 6',
+      'url': 'test url 6',
+      'likes': 10
+    }
+    const newLikes = { 'likes': 333 }
+    const response = await api.post('/api/blogs').send(testBlog)
+    const postID = response.body['id']
+
+    await api.put(`/api/blogs/${postID}`).send(newLikes)
+
+    const getResponse = await api.get('/api/blogs')
+    const blogObject = getResponse.body.find(x => x.id === postID)
+
+    expect(blogObject.likes).toBe(333)
   })
 })
 
