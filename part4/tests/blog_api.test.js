@@ -4,6 +4,8 @@ const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
 const listData = require('./listData')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
 const initialData = listData.listWithMultipleBlogs
 
@@ -121,6 +123,63 @@ describe('modification request test', () => {
     const blogObject = getResponse.body.find(x => x.id === postID)
 
     expect(blogObject.likes).toBe(333)
+  })
+})
+
+describe('user login and moficiation tests', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+
+    await user.save()
+  })
+
+  test('check if blog is deleteable by user who posted', async () => {
+    const newUser = {
+      "username": "deleteusertest",
+      "name": "test",
+      "password": "12345678"
+    }
+
+    const userResult = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const userId = userResult.body.id
+    //console.log(userId)
+
+    const loginResult = await api
+      .post('/api/login')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const userToken = {
+      'Authorization': `Bearer ${loginResult.body.token}`
+    }
+
+    const testBlog = {
+      "title": "Test delete",
+      "author": "Mr. Test delete",
+      "url": "test.test.com",
+      "userId": userId
+    }
+
+    const userIdBody = {
+      "userId": userId
+    }
+
+    const postResponse = await api.post('/api/blogs').send(testBlog)
+    //console.log(postResponse.body)
+    await api
+      .delete(`/api/blogs/${postResponse.body.id}`)
+      .send(userIdBody)
+      .set(userToken)
+      .expect(204)
   })
 })
 

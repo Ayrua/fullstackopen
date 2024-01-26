@@ -30,8 +30,20 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end()
+  const blog = await Blog.findById(request.params.id)
+  const decodedToken = request.token
+  // console.log(blog.user)
+  try {
+    if (blog.user.toString() === decodedToken.id) {
+      await Blog.findByIdAndDelete(request.params.id)
+      response.status(204).end()
+    } else {
+      response.status(400).end()
+    }
+  }
+  catch (exception) {
+    next(exception)
+  }
 })
 
 blogsRouter.put('/:id', async (request, response, next) => {

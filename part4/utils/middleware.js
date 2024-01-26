@@ -21,7 +21,7 @@ const getTokenFrom = request => {
 }
 
 const tokenExtractor = (request, response, next) => {
-  if (getTokenFrom(request).includes('Bearer')) {
+  if (getTokenFrom(request)) {
     const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
     if (!decodedToken.id) {
       return response.status(401).json({ error: 'token invalid' })

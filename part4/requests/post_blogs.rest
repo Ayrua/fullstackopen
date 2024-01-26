@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY1YjI4ZTVhMGMyNmQwZmJiMWI2OWEwZCIsImlhdCI6MTcwNjIwMTE2OH0.g2JdzGWehw-SdCC3RZ87gEQJCdTBI2ZO68F_5MlKhUo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY1YjNiZDZhYTA3Yzc1MGViYjBjNDVmNCIsImlhdCI6MTcwNjI3ODI2Mn0.8ejGg9KAZ2yviZ5AVs6AFO_naG0tGycwfs1PPzQKyIw
 
 {
     "title": "Test",
     "author": "Mr. Test",
     "url": "test.test.com",
-    "userId": "65b28e5a0c26d0fbb1b69a0d"
+    "userId": "65b3bd6aa07c750ebb0c45f4"
 }
