@@ -126,7 +126,15 @@ describe('modification request test', () => {
   })
 })
 
-describe('user login and moficiation tests', () => {
+describe('user login and modification tests', () => {
+  const newUser = {
+    "username": "deleteusertest",
+    "name": "test",
+    "password": "12345678"
+  }
+  let userId = undefined
+  let userToken = undefined
+
   beforeEach(async () => {
     await User.deleteMany({})
 
@@ -134,14 +142,6 @@ describe('user login and moficiation tests', () => {
     const user = new User({ username: 'root', passwordHash })
 
     await user.save()
-  })
-
-  test('check if blog is deleteable by user who posted', async () => {
-    const newUser = {
-      "username": "deleteusertest",
-      "name": "test",
-      "password": "12345678"
-    }
 
     const userResult = await api
       .post('/api/users')
@@ -149,8 +149,7 @@ describe('user login and moficiation tests', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const userId = userResult.body.id
-    //console.log(userId)
+    userId = userResult.body.id
 
     const loginResult = await api
       .post('/api/login')
@@ -158,10 +157,14 @@ describe('user login and moficiation tests', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
-    const userToken = {
+    userToken = {
       'Authorization': `Bearer ${loginResult.body.token}`
     }
 
+    await user.save()
+  })
+
+  test('check if blog is deleteable by user who posted', async () => {
     const testBlog = {
       "title": "Test delete",
       "author": "Mr. Test delete",
@@ -180,6 +183,18 @@ describe('user login and moficiation tests', () => {
       .send(userIdBody)
       .set(userToken)
       .expect(204)
+  })
+
+  test('check if blog is deleteable by user who didnt post', async () => {
+    const userIdBody = {
+      "userId": userId
+    }
+    
+    await api
+      .delete(`/api/blogs/5a422ba71b54a676234d17fb`)
+      .send(userIdBody)
+      .set(userToken)
+      .expect(400)
   })
 })
 
