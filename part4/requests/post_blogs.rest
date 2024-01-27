@@ -5,6 +5,5 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZ
 {
     "title": "Test",
     "author": "Mr. Test",
-    "url": "test.test.com",
-    "userId": "65b3bd6aa07c750ebb0c45f4"
+    "url": "test.test.com"
 }

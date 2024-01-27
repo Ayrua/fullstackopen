@@ -9,12 +9,42 @@ const bcrypt = require('bcrypt')
 
 const initialData = listData.listWithMultipleBlogs
 
+
+let auth_token = null
+
 // initializing dataset with list of 6
 beforeEach(async () => {
   await Blog.deleteMany({})
   for (const x of initialData) {
     let blogObject = new Blog(x)
     await blogObject.save()
+  }
+
+  await User.deleteMany({})
+
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+
+  await user.save()
+
+  const newUser = {
+    "username": "usertest",
+    "name": "test",
+    "password": "12345678"
+  }
+
+  await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const loginResult = await api
+    .post('/api/login')
+    .send(newUser)
+
+  auth_token = {
+    'Authorization': `Bearer ${loginResult.body.token}`
   }
 })
 
@@ -43,7 +73,11 @@ describe('post request tests', () => {
     const firstResponse = await api.get('/api/blogs')
     const firstLength = firstResponse.body.length
 
-    const postResponse = await api.post('/api/blogs').send(testBlog)
+    const postResponse = await api
+      .post('/api/blogs')
+      .send(testBlog)
+      .set(auth_token)
+      .expect(201)
     const postID = postResponse.body['id']
 
     const secondResponse = await api.get('/api/blogs')
@@ -63,7 +97,7 @@ describe('schema tests', () => {
       'author': 'test name 2',
       'url': 'test url 2',
     }
-    const postResponse = await api.post('/api/blogs').send(testBlog)
+    const postResponse = await api.post('/api/blogs').send(testBlog).set(auth_token)
     const postID = postResponse.body['id']
 
     const getResponse = await api.get('/api/blogs')
@@ -78,7 +112,7 @@ describe('schema tests', () => {
       'author': 'test name 3',
       'url': 'test url 3',
     }
-    await api.post('/api/blogs').send(testBlog).expect(400)
+    await api.post('/api/blogs').send(testBlog).set(auth_token).expect(400)
   })
 
   test('check if blogs created without url return 400', async () => {
@@ -87,7 +121,7 @@ describe('schema tests', () => {
       'author': 'test name 4',
       // 'url': 'test url 4',
     }
-    await api.post('/api/blogs').send(testBlog).expect(400)
+    await api.post('/api/blogs').send(testBlog).set(auth_token).expect(400)
   })
 })
 
@@ -98,12 +132,12 @@ describe('modification request test', () => {
       'author': 'test name 5',
       'url': 'test url 5',
     }
-    const response = await api.post('/api/blogs').send(testBlog)
+    const response = await api.post('/api/blogs').send(testBlog).set(auth_token)
     const postID = response.body['id']
     //console.log(response.body)
     //console.log(postID)
 
-    await api.delete(`/api/blogs/${postID}`).expect(204)
+    await api.delete(`/api/blogs/${postID}`).set(auth_token).expect(204)
   })
 
   test('check if blogs likes change by id', async () => {
@@ -114,7 +148,7 @@ describe('modification request test', () => {
       'likes': 10
     }
     const newLikes = { 'likes': 333 }
-    const response = await api.post('/api/blogs').send(testBlog)
+    const response = await api.post('/api/blogs').send(testBlog).set(auth_token)
     const postID = response.body['id']
 
     await api.put(`/api/blogs/${postID}`).send(newLikes)
@@ -127,73 +161,25 @@ describe('modification request test', () => {
 })
 
 describe('user login and modification tests', () => {
-  const newUser = {
-    "username": "deleteusertest",
-    "name": "test",
-    "password": "12345678"
-  }
-  let userId = undefined
-  let userToken = undefined
-
-  beforeEach(async () => {
-    await User.deleteMany({})
-
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({ username: 'root', passwordHash })
-
-    await user.save()
-
-    const userResult = await api
-      .post('/api/users')
-      .send(newUser)
-      .expect(201)
-      .expect('Content-Type', /application\/json/)
-
-    userId = userResult.body.id
-
-    const loginResult = await api
-      .post('/api/login')
-      .send(newUser)
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-
-    userToken = {
-      'Authorization': `Bearer ${loginResult.body.token}`
-    }
-
-    await user.save()
-  })
-
   test('check if blog is deleteable by user who posted', async () => {
     const testBlog = {
       "title": "Test delete",
       "author": "Mr. Test delete",
       "url": "test.test.com",
-      "userId": userId
     }
 
-    const userIdBody = {
-      "userId": userId
-    }
-
-    const postResponse = await api.post('/api/blogs').send(testBlog)
+    const postResponse = await api.post('/api/blogs').send(testBlog).set(auth_token)
     //console.log(postResponse.body)
     await api
       .delete(`/api/blogs/${postResponse.body.id}`)
-      .send(userIdBody)
-      .set(userToken)
+      .set(auth_token)
       .expect(204)
   })
 
   test('check if blog is deleteable by user who didnt post', async () => {
-    const userIdBody = {
-      "userId": userId
-    }
-    
     await api
       .delete(`/api/blogs/5a422ba71b54a676234d17fb`)
-      .send(userIdBody)
-      .set(userToken)
+      .set(auth_token)
       .expect(400)
   })
 })
