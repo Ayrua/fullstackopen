@@ -31,6 +31,13 @@ const tokenExtractor = (request, response, next) => {
   next()
 }
 
+const userExtractor = (request, response, next) => {
+  if (request.token) {
+    request.user = request.token.id
+  }
+  next()
+}
+
 module.exports = {
-  errorHandler, tokenExtractor
+  errorHandler, tokenExtractor, userExtractor
 }

@@ -9,8 +9,7 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const body = request.body
-
-  const decodedToken = request.token
+  //const decodedToken = request.token
 
   const user = await User.findById(body.userId)
   const blog = new Blog({
@@ -34,9 +33,9 @@ blogsRouter.delete('/:id', async (request, response) => {
   const decodedToken = request.token
   // console.log(blog.user)
   // check if variable exists...
-  if(!blog.user) response.status(400).end()
+  if (!blog.user) response.status(400).end()
   try {
-    if (blog.user.toString() === decodedToken.id) {
+    if (blog.user.toString() === request.user) {
       await Blog.findByIdAndDelete(request.params.id)
       response.status(204).end()
     } else {
