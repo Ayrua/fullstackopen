@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import './index.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -12,6 +13,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -40,9 +43,19 @@ const App = () => {
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
+
+      setMessage(`Success logging in!`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 3000)
     }
     catch (exception) {
       console.log('error while logging in: ', exception.message)
+
+      setMessage(`Wrong username or password!`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 3000)
     }
   }
 
@@ -52,6 +65,11 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogUser')
     setUser(null)
     blogService.setToken(null)
+
+    setMessage(`logged out!`)
+    setTimeout(() => {
+      setMessage(null)
+    }, 3000)
   }
 
   const handleAddBlog = async (event) => {
@@ -65,8 +83,18 @@ const App = () => {
       setAuthor('')
       setUrl('')
       setTitle('')
-    } catch (expection) {
+
+      setMessage(`Blog '${newBlog.title}' by '${blog.author}' was added!`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 3000)
+    } catch (exception) {
       console.log('error while adding blog: ', exception.message)
+
+      setMessage(`There was an error adding the Blog`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 3000)
     }
 
   }
@@ -111,6 +139,18 @@ const App = () => {
     </form>
   )
 
+  const Notification = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+
+    return (
+      <div className='message'>
+        {message}
+      </div>
+    )
+  }
+
   const blogList = () => {
     return (
       blogs.map(blog =>
@@ -121,6 +161,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={message} />
       <div>
         {user === null ? 'please log in' : user.username + ' is logged in'}
         {user === null ? '' : logoutForm()}
