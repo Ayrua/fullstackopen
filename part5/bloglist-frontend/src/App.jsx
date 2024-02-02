@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
@@ -15,6 +16,8 @@ const App = () => {
   const [url, setUrl] = useState('')
 
   const [message, setMessage] = useState(null)
+
+  const [addBlogVisible, setAddBlogVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -83,6 +86,7 @@ const App = () => {
       setAuthor('')
       setUrl('')
       setTitle('')
+      setAddBlogVisible(false)
 
       setMessage(`Blog '${newBlog.title}' by '${blog.author}' was added!`)
       setTimeout(() => {
@@ -119,25 +123,31 @@ const App = () => {
     </form>
   )
 
-  const addBlogsForm = () => (
-    <form onSubmit={handleAddBlog}>
-      <p>Add a new Blog:</p>
-      <div>
-        title
-        <input type="text" value={title} name="Title" onChange={({ target }) => setTitle(target.value)} />
-      </div>
-      <div>
-        author
-        <input type="text" value={author} name="Author" onChange={({ target }) => setAuthor(target.value)} />
-      </div>
-      <div>
-        url
-        <input type="text" value={url} name="Url" onChange={({ target }) => setUrl(target.value)} />
-      </div>
+  const addBlogForm = () => {
+    const hideWhenVisible = { display: addBlogVisible ? 'none' : '' }
+    const showWhenVisible = { display: addBlogVisible ? '' : 'none' }
 
-      <button type="submit">add</button>
-    </form>
-  )
+    return (
+      <div>
+        <div style={hideWhenVisible}>
+          <button onClick={() => setAddBlogVisible(true)}>new blog</button>
+        </div>
+        <div style={showWhenVisible}>
+          <BlogForm
+            title={title}
+            author={author}
+            url={url}
+            handleTitleChange={({ target }) => setTitle(target.value)}
+            handleAuthorChange={({ target }) => setAuthor(target.value)}
+            handleUrlChange={({ target }) => setUrl(target.value)}
+            handleAddBlog={handleAddBlog}
+          />
+          <button onClick={() => setAddBlogVisible(false)}>cancel</button>
+        </div>
+      </div>
+    )
+  }
+
 
   const Notification = ({ message }) => {
     if (message === null) {
@@ -166,7 +176,7 @@ const App = () => {
         {user === null ? 'please log in' : user.username + ' is logged in'}
         {user === null ? '' : logoutForm()}
       </div>
-      {user === null ? null : addBlogsForm()}
+      {user === null ? null : addBlogForm()}
       {user === null ? loginForm() : blogList()}
     </div>
   )
