@@ -96,6 +96,17 @@ const App = () => {
     }
   }
 
+  const handleLikes = async (id, blogObject) => {
+    try {
+      // console.log(id, blogObject)
+      await blogService.update(id, blogObject)
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+    } catch (exception) {
+      console.log('error while adding likes: ', exception.message)
+    }
+  }
+
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <div>
@@ -138,7 +149,7 @@ const App = () => {
   const blogList = () => {
     return (
       blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleLikes={handleLikes} />
       ))
   }
 
