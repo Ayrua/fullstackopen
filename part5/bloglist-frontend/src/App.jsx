@@ -78,7 +78,8 @@ const App = () => {
     console.log('adding new blog', blogObject)
 
     try {
-      const blog = await blogService.create(blogObject)
+      let blog = await blogService.create(blogObject)
+      blog.user = user
       setBlogs(blogs.concat(blog))
 
       setMessage(`Blog '${blog.title}' by '${blog.author}' was added!`)
