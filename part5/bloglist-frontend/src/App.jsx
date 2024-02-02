@@ -107,6 +107,19 @@ const App = () => {
     }
   }
 
+  const handleDelete = async (blog) => {
+    if (window.confirm(`Do you really want to delete the blog ${blog.title}`)) {
+      try {
+        //console.log(id)
+        await blogService.delReq(blog.id)
+        const blogs = await blogService.getAll()
+        setBlogs(blogs)
+      } catch (exception) {
+        console.log('error while adding likes: ', exception.message)
+      }
+    }
+  }
+
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <div>
@@ -150,7 +163,7 @@ const App = () => {
     const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
     return (
       sortedBlogs.map(blog =>
-        <Blog key={blog.id} blog={blog} handleLikes={handleLikes} />
+        <Blog key={blog.id} blog={blog} handleLikes={handleLikes} handleDelete={handleDelete} />
       ))
   }
 
