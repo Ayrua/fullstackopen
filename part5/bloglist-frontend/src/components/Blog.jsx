@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from 'react'
 
 const Blog = ({ blog, user, handleLikes, handleDelete }) => {
   const [visible, setVisible] = useState(false)
@@ -46,7 +46,7 @@ const Blog = ({ blog, user, handleLikes, handleDelete }) => {
           <p>{blog.url}</p>
           <p>likes {blog.likes} <button onClick={() => addLikes()}>like</button></p>
           <p>{username()}</p>
-          <DeleteButton/>
+          <DeleteButton />
         </div>
       </div>
     </div>

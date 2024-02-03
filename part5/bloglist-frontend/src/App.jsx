@@ -45,7 +45,7 @@ const App = () => {
       setUsername('')
       setPassword('')
 
-      setMessage(`Success logging in!`)
+      setMessage('Success logging in!')
       setTimeout(() => {
         setMessage(null)
       }, 3000)
@@ -53,7 +53,7 @@ const App = () => {
     catch (exception) {
       console.log('error while logging in: ', exception.message)
 
-      setMessage(`Wrong username or password!`)
+      setMessage('Wrong username or password!')
       setTimeout(() => {
         setMessage(null)
       }, 3000)
@@ -67,7 +67,7 @@ const App = () => {
     setUser(null)
     blogService.setToken(null)
 
-    setMessage(`logged out!`)
+    setMessage('logged out!')
     setTimeout(() => {
       setMessage(null)
     }, 3000)
@@ -89,7 +89,7 @@ const App = () => {
     } catch (exception) {
       console.log('error while adding blog: ', exception.message)
 
-      setMessage(`There was an error adding the Blog`)
+      setMessage('There was an error adding the Blog')
       setTimeout(() => {
         setMessage(null)
       }, 3000)
