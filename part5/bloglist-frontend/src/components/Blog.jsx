@@ -26,13 +26,13 @@ const Blog = ({ blog, user, handleLikes, handleDelete }) => {
     // console.log(blog.user && blog.user.username === user.username)
     if (blog.user && (blog.user.username === user.username)) {
       return (
-        <button onClick={() => deleteBlog()}>delete</button>
+        <button id='deleteButton' onClick={() => deleteBlog()}>delete</button>
       )
     }
   }
 
   return (
-    <div className='container'>
+    <div className='blog'>
       <div style={hideWhenVisible}>
         {blog.title} {blog.author}
         <> </>
@@ -44,7 +44,7 @@ const Blog = ({ blog, user, handleLikes, handleDelete }) => {
         <button onClick={() => setVisible(false)}>hide</button>
         <div>
           <p>{blog.url}</p>
-          <p>likes {blog.likes} <button onClick={() => addLikes()}>like</button></p>
+          <p>likes {blog.likes} <button id='likeButton' onClick={() => addLikes()}>like</button></p>
           <p>{username()}</p>
           <DeleteButton />
         </div>
