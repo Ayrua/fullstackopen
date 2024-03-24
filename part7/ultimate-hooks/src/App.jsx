@@ -18,10 +18,17 @@ const useField = (type) => {
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
-  // ...
+  const getResources = async () => axios.get(baseUrl).then((res) => res.data).then(data => {
+    setResources(data)
+  })
 
-  const create = (resource) => {
-    // ...
+  useEffect(() => {
+    getResources()
+  }, [baseUrl])
+
+  const create = async (resource) => {
+    axios.post(baseUrl, resource).then((res) => res.data);
+    getResources() // to refresh the page
   }
 
   const service = {
@@ -45,10 +52,10 @@ const App = () => {
     event.preventDefault()
     noteService.create({ content: content.value })
   }
- 
+
   const handlePersonSubmit = (event) => {
     event.preventDefault()
-    personService.create({ name: name.value, number: number.value})
+    personService.create({ name: name.value, number: number.value })
   }
 
   return (
@@ -62,7 +69,7 @@ const App = () => {
 
       <h2>persons</h2>
       <form onSubmit={handlePersonSubmit}>
-        name <input {...name} /> <br/>
+        name <input {...name} /> <br />
         number <input {...number} />
         <button>create</button>
       </form>
